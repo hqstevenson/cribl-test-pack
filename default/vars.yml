@@ -1,0 +1,4 @@
+cribl_group:
+  type: string
+  lib: custom
+  value: "'default'"

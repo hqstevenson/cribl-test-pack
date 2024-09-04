@@ -1,0 +1,51 @@
+output: default
+streamtags: []
+groups: {}
+asyncFuncTimeout: 1000
+functions:
+  - id: eval
+    filter: "true"
+    disabled: null
+    conf:
+      add:
+        - disabled: false
+          name: group
+          value: C.env.CRIBL_GROUP_ID || C.vars.cribl_group
+  - id: serialize
+    filter: "true"
+    disabled: null
+    conf:
+      type: json
+      dstField: _raw
+      fields:
+        - "!_*"
+        - "!host"
+        - "!index"
+        - "!source"
+        - "!sourcetype"
+        - "!time"
+        - "*"
+  - id: eval
+    filter: "true"
+    disabled: null
+    conf:
+      add:
+        - disabled: false
+          name: source
+          value: source || __inputId
+        - disabled: false
+          name: sourcetype
+          value: "`cribl:log:${(channel.indexOf(':') > 0 ? channel.substr(0,
+            channel.indexOf(':')) : channel).toLowerCase()}`"
+        - disabled: false
+          name: index
+          value: "'cribl_logs'"
+      keep:
+        - _raw
+        - _time
+        - host
+        - index
+        - source
+        - sourcetype
+      remove:
+        - "*"

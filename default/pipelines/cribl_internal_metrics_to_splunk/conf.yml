@@ -1,0 +1,89 @@
+output: default
+streamtags: []
+groups:
+  CPxsD8:
+    name: Set fields for delivery to Splunk
+    index: 5
+    disabled: false
+asyncFuncTimeout: 1000
+functions:
+  - id: eval
+    filter: event_host == C.os.hostname()
+    disabled: null
+    conf:
+      remove:
+        - event_host
+  - id: eval
+    filter: ci == input
+    disabled: null
+    conf:
+      remove:
+        - ci
+  - id: eval
+    filter: co == output
+    disabled: null
+    conf:
+      remove:
+        - co
+  - id: eval
+    filter: event_source == 'cribl'
+    disabled: true
+    conf:
+      remove:
+        - event_source
+  - id: rollup_metrics
+    filter: "true"
+    disabled: false
+    conf:
+      dimensions: []
+      timeWindow: 60s
+      gaugeRollup: last
+  - id: eval
+    filter: "true"
+    disabled: false
+    conf:
+      add:
+        - disabled: false
+          name: __inputId
+          value: __inputId || 'cribl:CriblMetrics'
+        - name: host
+          value: C.os.hostname()
+        - name: index
+          value: "'cribl_metrics'"
+        - name: source
+          value: "'cribl:metrics'"
+        - name: sourcetype
+          value: "'cribl:metric'"
+      remove: []
+    groupId: CPxsD8
+  - id: regex_extract
+    filter: "true"
+    disabled: false
+    conf:
+      source: _metric
+      iterations: 100
+      overwrite: false
+      regex: /\.(?:(?<direction>in|out|dropped)_)?(?<_metric_class>[^.]+)$/
+    groupId: CPxsD8
+  - id: eval
+    filter: _metric_class
+    disabled: false
+    conf:
+      add:
+        - name: sourcetype
+          value: "`cribl:metric:${_metric_class}`"
+      remove:
+        - _metric_class
+    groupId: CPxsD8
+  - id: code
+    filter: __criblMetrics
+    disabled: false
+    conf:
+      maxNumOfIterations: 5000
+      code: "__e['__criblMetrics'].forEach(criblMetric => {\r
+
+        \tcriblMetric.dims = criblMetric.dims.filter( dim => [ \"host\",
+        \"index\", \"source\", \"sourcetype\"].includes(dim) ? false : true );\r
+
+        });"
+description: Splunk Metrics app

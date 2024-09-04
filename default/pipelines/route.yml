@@ -1,0 +1,26 @@
+id: default
+groups: {}
+comments: []
+routes:
+  - id: bwUtqB
+    name: cribl_internal_logs
+    final: true
+    disabled: false
+    pipeline: cribl_internal_logs_to_splunk
+    description: ""
+    clones: []
+    enableOutputExpression: false
+    outputExpression: null
+    filter: __inputId=='cribl:CriblLogs'
+    output: default
+  - id: fsJS6A
+    name: cribl_internal_metrics
+    final: true
+    disabled: false
+    pipeline: cribl_internal_metrics_to_splunk
+    description: ""
+    clones: []
+    enableOutputExpression: false
+    outputExpression: null
+    filter: __inputId=='cribl:CriblMetrics'
+    output: default
