@@ -39,7 +39,7 @@ functions:
             channel.indexOf(':')) : channel).toLowerCase()}`"
         - disabled: false
           name: index
-          value: "'cribl_logs'"
+          value: "'cribl_internal_logs'"
       keep:
         - _raw
         - _time
